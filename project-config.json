@@ -1,0 +1,15 @@
+{
+    "name": "c64_game_engine",
+    "description": "Project C64 Game Engine",
+    "toolkit": "kick",
+    "sources": [
+        "src/c64_game_engine.asm"
+    ],
+    "build": "debug",
+    "definitions": [],
+    "includes": [
+        "src/includes"
+    ],
+    "args": [],
+    "compiler": ""
+}
