@@ -2,7 +2,7 @@
 Remember, all assembled programms have a two bytes starting address, those are written 2 bytes before the real program starts
 stores a readfile function in the variable 'readfile'
 */
-.macro autostart(start, progfilename) {
+.macro autostart(start, progfilename, nobasic) {
     .segment Autostart[] "Autostart"
     * = $326	//DO NOT CHANGE, else the autostart will fail
 
@@ -17,6 +17,10 @@ stores a readfile function in the variable 'readfile'
     //* = $334 (cassette buffer)
 
 boot:	RepairCharOutVector()
+        .if (nobasic != 0) {
+            lda #$37	//unload BASIC rom
+            sta $01
+        }
         ReadFileJumpTo(progfilename, start-2, start)
 //rfile: ReadFile($0400)
 //.eval readfile = rfile

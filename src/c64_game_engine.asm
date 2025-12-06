@@ -5,15 +5,18 @@
     [name="MAIN"         , type="prg", segments="ProgStart"],
 }
 assemblyInfo(start, endoffile, 0)
-
+.var nobasic = 1 //unload BASIC rom
 /* Autostart after LOAD "*",8,1 the main program file */
-autostart(start, progfilename)
+autostart(start, progfilename, nobasic)
 progfilename: .text @"MAIN\$00"
 
-.segment ProgStart[outPrg="c64ge"] "Programm Start"
+.segment ProgStart[outPrg="c64ge.prg"] "Programm Start"
     *=$0800
 start:
+
+Div8BitAcc(100, 15, $0400)
+
     lda #1
     sta $d020
-    jmp start
+loop:    jmp loop
 endoffile:
