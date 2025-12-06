@@ -3,7 +3,7 @@
     "description": "Project C64 Game Engine",
     "toolkit": "kick",
     "sources": [
-        "src/c64_game_engine.asm"
+        "src/main.asm"
     ],
     "build": "debug",
     "definitions": [],

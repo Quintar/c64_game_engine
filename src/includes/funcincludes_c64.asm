@@ -18,7 +18,7 @@
     .print "BASIC Vektoren $0300 - $03ff"
     .print "Screen Memory $0400 - $07ff"
     .print "BASIC Prg Start $0800"
-    .print "Programm Offset: $" + toHexString(start) + " - $" + toHexString(end)
+    .print "Programm Offset: " + start + " = $" + toHexString(start)
     .print "Programm Size: " + (end - start) + " Byte"
     .print "FREE Space from $" + toHexString(end) + " to $d7ff = " + ($d7ff - end) + " Bytes"
     .print "Sprite offset: $" + toHexString(spriteoffset * 64)
