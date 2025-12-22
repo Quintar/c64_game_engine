@@ -1,15 +1,8 @@
-#import "labelincludes_c64.asm"
-//#import "stack.asm"
-#import "file_c64.asm"
-#import "autostart_c64.asm"
+#import "stack.asm"
 #import "math.asm"
-//#import "screen_c64.asm"
-//#import "scroll_c64.asm"
-//#import "raster_c64.asm"
-//#import "map_c64.asm"
 #import "memmanipulation.asm"
-//#import "sprites_c64.asm"
-//#import "keyboard_c64.asm"
+
+#import "c64_includes.asm"
 
 .macro assemblyInfo(start, end, spriteoffset) {
     .print "Zero Page $0000 - $00ff"

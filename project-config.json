@@ -8,7 +8,8 @@
     "build": "debug",
     "definitions": [],
     "includes": [
-        "src/includes"
+        "src/includes",
+        "src/c64_includes"
     ],
     "args": [],
     "compiler": ""
