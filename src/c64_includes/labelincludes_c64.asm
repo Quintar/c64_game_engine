@@ -75,7 +75,9 @@
 .var viccfg1         = $d016     // VIC configuration Bit 7-5=unused// 4=Multi-Color-mode// 3=40 coloumns// 2-0=scroll X
 .var asciicfg        = $d018     // Bit 7-4 = screen-memory-Offset// 3-1 = character-address-offset // 0 unused
 .var foreground      = $d021     // background color (rotates through all 16 colors)
+.var screencolor     = $d021     // background color (rotates through all 16 colors)
 .var background      = $d020     // border color (rotates through all 16 colors)
+.var bordercolor     = $d020     // border color (rotates through all 16 colors)
 .var vicmemorycfg    = $dd00     // Bit 0-1 configure the VIC-memory bank 00=3, 01=2, 10=1, 11=0 // 2-7 are for RS232
 .var screen0         = $0000     // Screen-address 0 d018: 0000 XXXX
 .var screen1         = $0400     // Screen-address 1 d018: 0001 XXXX (Standard)
@@ -120,6 +122,25 @@
 //Interesting Constants
 .var screensize = $03f8
 .var spritesize = $40
+
+//Colors
+.var black       = $00
+.var white       = $01
+.var red         = $02
+.var cyan        = $03
+.var purple      = $04
+.var green       = $05
+.var blue        = $06
+.var yellow      = $07
+.var orange      = $08
+.var brown       = $09
+.var lightred    = $0a
+.var gray1       = $0b
+.var gray2       = $0c
+.var lightgreen  = $0d
+.var lightblue   = $0e
+.var gray3       = $0f
+
 
 //My variables
 .var text     = $17      // Textaddressen Pointer
