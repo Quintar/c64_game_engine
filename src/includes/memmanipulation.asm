@@ -32,7 +32,7 @@ end:
 .var CopyToLineOffset= $FD //zeroUnused3
 .var CopyToLineLength= $FE //zeroUnused4
 
-.macro SetupQuickCopy(source, target, length, mapLengthAfterScreenLine) {
+.macro SetupCopy(source, target, length, mapLengthAfterScreenLine) {
         lda #<source
         sta src+1
         lda #>source
@@ -64,7 +64,7 @@ end:
 
     dex                               //2
     bne incSource                     //2
-    ldx CopyToLineLength //default line length      2
+    ldx CopyToLineLength //default line length      3
     clc //Add LineOffset to source after each line  2
     lda src+1                         //4
     adc CopyToLineOffset              //3
@@ -80,9 +80,9 @@ incTrgt: inc tgt+1                    //6
     bne decTimer                      //2
     inc tgt+2                         //6
 
-decTimer:    dec CopyToTimesLow       //6
+decTimer:    dec CopyToTimesLow       //5
     bne src                           //2
-    dec CopyToTimesHigh               //6
+    dec CopyToTimesHigh               //5
     bne src                           //2
 }
 

@@ -1,3 +1,9 @@
+// Raster timings
+.var onCharScreen = 50
+.var onCharScreenEnd = onCharScreen + 200
+.var onVBlankStart = 300
+.var onVBlankEnd = 312
+
 #import "hexe_main.asm"
 
 .segment ProgStart[outPrg="c64ge.prg"] "Programm Start"
@@ -47,14 +53,10 @@ begin:
     .var stateOverWorldScroll = 3
     .var stateOverWorldPaint = 4
 
-    // Raster timings
-    .var onCharScreen = 50
-    .var onCharScreenEnd = onCharScreen + 200
-    .var onVBlankStart = 300
-    .var onVBlankEnd = 312
-
 // Initial Setup
     SetupFirstStart()
+
+    ShowMainMenu()
 
     setupKeyboard:
     {
@@ -65,9 +67,7 @@ begin:
     }
 
 // Main Loop
-loop:    
-    
-    jmp loop
+loop:    jmp loop
 
 doRaster:
     EndRaster()
@@ -95,6 +95,6 @@ QuickSetColorRam:
     QuickSetColorRamFromA()
     rts
     
-QuickCopy: CopyTo()
+Copy: CopyTo()
     rts
 Strings()
