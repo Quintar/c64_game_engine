@@ -9,7 +9,8 @@
     "definitions": [],
     "includes": [
         "src/includes",
-        "src/c64_includes"
+        "src/c64_includes",
+        "src/game"
     ],
     "args": [],
     "compiler": ""

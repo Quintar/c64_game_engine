@@ -9,7 +9,7 @@
 autostart(begin, progfilename, nobasic)
 progfilename: .text @"MAIN\$00"
 
-#import "c64_game_engine.asm"
+#import "game/game_main.asm"
 endoffile:
 
 assemblyInfo(begin, endoffile, 0)
