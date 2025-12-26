@@ -27,6 +27,66 @@ siz:    .word size
 end:    
 }
 
+.var CopyToTimesLow=   $FB //zeroUnused1
+.var CopyToTimesHigh=  $FC //zeroUnused2
+.var CopyToLineOffset= $FD //zeroUnused3
+.var CopyToLineLength= $FE //zeroUnused4
+
+.macro SetupQuickCopy(source, target, length, mapLengthAfterScreenLine) {
+        lda #<source
+        sta src+1
+        lda #>source
+        sta src+2
+        lda #<target
+        sta tgt+1
+        lda #>target
+        sta tgt+2
+        lda #<length //Screensize in Characters
+        sta zeroUnused1
+        lda #>length //Screensize in Characters
+        sta zeroUnused2
+        lda #mapLengthAfterScreenLine //mapLength - LineLength
+        sta zeroUnused3
+        lda #40 //Screen-Line length
+        sta zeroUnused4
+        tax
+
+}
+
+// Set src to source and target to target, 
+// the code is self modifying so it needs to be reset each time
+// 4+4+2+2+6+2+6+2+6+2=36*40=1440 = 2.9lines (complete with H-Blank < 504*8=4032)
+// 4+4+2+2+ (2+2+4+3+4+2=17) (- 6+2+6=14) +3 (every full line)
+// = 1443 Cycles per 40-character-line = ~3 Raster-Lines
+.macro CopyTo() {    
+    @src:    lda $ffff  //set to source 4
+    @tgt:    sta $ffff  //set to target 4
+
+    dex                               //2
+    bne incSource                     //2
+    ldx CopyToLineLength //default line length      2
+    clc //Add LineOffset to source after each line  2
+    lda src+1                         //4
+    adc CopyToLineOffset              //3
+    sta src+1                         //4
+    bcc incTrgt                       //2
+    inc src+2                         //6
+    jmp incTrgt                       //3
+
+incSource: inc src+1                  //6
+    bne incTrgt                       //2
+    inc src+2                         //6
+incTrgt: inc tgt+1                    //6
+    bne decTimer                      //2
+    inc tgt+2                         //6
+
+decTimer:    dec CopyToTimesLow       //6
+    bne src                           //2
+    dec CopyToTimesHigh               //6
+    bne src                           //2
+}
+
+
 /*
 Copies data 'from' 'to' for 'count' (max = 255) bytes times 'multiplier'. 'offset' is the offset between copy lines.
 

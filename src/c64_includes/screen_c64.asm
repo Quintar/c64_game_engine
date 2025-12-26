@@ -4,18 +4,18 @@
 
 .macro Set40Column(yes) {
         lda viccfg1
-        and #$f7 // clear bit 3 = 39 columns
-        .if (yes) {
-            ora #$04 // set bit 3 = 40 columns
+        and #$f7 // clear bit 3 = 40 columns
+        .if (!yes) {
+            ora #$04 // set bit 3 = 39 columns
         }
         sta viccfg1
 }
 
 .macro Set25Rows(yes) {
         lda viccfg0
-        and #$f7 // clear bit 3 = 24 rows
-        .if (yes) {
-            ora #$04 // set bit 3 = 25 rows
+        and #$f7 // clear bit 3 = 25 rows
+        .if (!yes) {
+            ora #$04 // set bit 3 = 24 rows
         }
         sta viccfg0
 }
@@ -105,6 +105,20 @@ Doesn't touch beam bit, deactivates extended color mode, deactivates bitmap mode
     jmp copy
     end:
 }
+
+.macro QuickSetColorRamFromA() {
+    ldy #0
+    copy:
+    .for (var i=0; i<25; i++) {
+        sta colorram+(i*40), y
+    }
+    iny
+    cpy #40
+    beq end
+    jmp copy
+    end:
+}
+
 
 /**
   Copies the last 24 columns of screen1 to screen3

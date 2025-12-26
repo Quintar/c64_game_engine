@@ -1,5 +1,7 @@
+#import "hexe_main.asm"
+
 .segment ProgStart[outPrg="c64ge.prg"] "Programm Start"
-    *=$0803
+    *=$0800
 begin: 
 // Game Coding Style: Statemachine
 // Each state is represented by a subroutine:
@@ -21,10 +23,6 @@ begin:
 // - Game over
 
     //My variables
-    .var text     = $17      // Textaddressen Pointer
-    .var file     = $19      // Dateiinhaltaddressen Pointer
-    .var jmpto    = $22      // Springe nach Addressen Pointer
-
     .var scrnpos  = $22      // Cursor Position Addressen Pointer
     .var sprpak   = $71      // Spritepacket
     .var sprpos   = $72      // Spritearrayposition
@@ -49,25 +47,24 @@ begin:
     .var stateOverWorldScroll = 3
     .var stateOverWorldPaint = 4
 
-
+    // Raster timings
     .var onCharScreen = 50
     .var onCharScreenEnd = onCharScreen + 200
     .var onVBlankStart = 300
     .var onVBlankEnd = 312
 
+// Initial Setup
+    SetupFirstStart()
 
+    setupKeyboard:
+    {
+        lda #1                  // Set keyboard buffer size to 1
+        sta maxKeyBuffer        
+        lda %10                 // all keys repeat
+        sta keyRepeatSwitch     // disable key repeat
+    }
 
-// Set up screen
-    lda #black
-    sta bordercolor          // border color
-    sta screencolor          // background color
-    Set40Column(false)
-    Set25Rows(false)
-
-// Setup first raster interrupt
-    InitRaster()
-    //OnRaster(onCharScreen, doRaster) // setup raster interrupt at line 50
-
+// Main Loop
 loop:    
     
     jmp loop
@@ -91,3 +88,13 @@ doRenderGraphics:
 doLoadMapParts:
     rts
 
+readFile:
+    ReadFile(zeroUnused1) //No rts needed as you jump away in this funciton
+
+QuickSetColorRam:
+    QuickSetColorRamFromA()
+    rts
+    
+QuickCopy: CopyTo()
+    rts
+Strings()

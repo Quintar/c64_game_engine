@@ -30,7 +30,7 @@ git clone https://github.com/Quintar/c64_game_engine.git
 ### Build and Run
 
 1. Open the project in Visual Studio Code
-2. Edit the c64_game_engine.asm source file _(will change later to make it all more organised and customizeable)_
+2. Edit the game/fame_main.asm source file
 3. Compile and run the game.
 
 ## Contributing

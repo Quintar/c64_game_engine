@@ -26,6 +26,10 @@
 .var zeroUnused4 = $FE
 .var FloatToAsciiTemp = $FF
 
+//Keyboard
+.var maxKeyBuffer = $0289  // Maximum length of keyboard buffer. Values: $00, 0: No buffer. $01-$0F, 1-15: Buffer size.
+.var keyRepeatSwitch = $028a  // Bits #6-#7: %00 = Only cursor up/down, cursor left/right, Insert/Delete and Space repeat; %01 = No key repeats; %1x = All keys repeat.
+
 //$DC10-$DCFF	56336-56575	The CIA 1 register are mirrored each 16 Bytes
 //Joystick
 .var joyport2 = $dc00    // Joystickport 2 + Bit 0-7 Keyboard Columns; also 4 Lightpen; Paddles 2..3 Fire buttons, 6..7 Switch control port 1 (%01=Paddles A) or 2 (%10=Paddles B)
