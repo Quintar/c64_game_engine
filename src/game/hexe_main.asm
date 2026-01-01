@@ -1,3 +1,4 @@
+
 .macro SetupFirstStart() {
         DeactivateBasic()
         ClearScreen()
@@ -26,9 +27,15 @@
 .macro ShowGamePlay() {
     .var MapRam = $4000
     .var maplength = 64
+        // Load Sprites and Background-Data
+    hexmap: SetPointers(hexebackmap, MapRam, bchar)
+            jmp readFile
+    bchar: SetPointers(hexebackchars, charram4, endreads)
+            jmp readFile
+    endreads:
 
     // Set background color to black
-        SetBackgroundColor(0)
+        SetBackgroundColor(2)
     // Set Colorram to white
         lda #1
         jsr QuickSetColorRam
@@ -36,13 +43,6 @@
     //Set characters to mem-map 4
         SetCharacterMapPointer(4)
         setColors(0,0,0)
-
-        // Load Sprites and Background-Data
-    hexmap: SetPointers(hexebackmap, MapRam, bchar)
-            jmp readFile
-    bchar: SetPointers(hexebackchars, charram4, endreads)
-            jmp readFile
-    endreads:
 
     //Copy first map-screen to screen
         SetupCopy(MapRam, screen1, 1255, maplength-39)
