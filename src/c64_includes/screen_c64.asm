@@ -5,7 +5,7 @@
 .macro Set40Column(yes) {
         lda viccfg1
         and #$f7 // clear bit 3 = 40 columns
-        .if (!yes) {
+        .if (yes) {
             ora #$04 // set bit 3 = 39 columns
         }
         sta viccfg1
@@ -14,7 +14,7 @@
 .macro Set25Rows(yes) {
         lda viccfg0
         and #$f7 // clear bit 3 = 25 rows
-        .if (!yes) {
+        .if (yes) {
             ora #$04 // set bit 3 = 24 rows
         }
         sta viccfg0
@@ -266,7 +266,7 @@ tgt:    sta colorram
 }
 
 // Schifts the whole screen @ $0400 up a line
-.macro ShiftScreenUp() {
+.macro ShiftScreenUp_OLD() {
 // Load character from screen and put up a line
 lda #$04
 sta src+2
@@ -307,8 +307,43 @@ tgt:    sta $ffff //0400 1024
         bne src
 }
 
-// Shifts the whole screen @ $0400 down a line
+
 .macro ShiftScreenDown() {
+    ldy #40
+    print:
+    .for (var i=24; i>=1; i--) {
+        // Screen
+        lda $0400+((i-1)*40),y
+        sta $0400+(i*40),y
+        // ColorMap
+        //lda $d800+(i*40),y
+        //sta $d800+(i*40),y
+    }
+    dey
+    bmi end
+    jmp print
+    end:
+}
+
+.macro ShiftScreenUp() {
+    ldy #40
+    print:
+    .for (var i=0; i<=23; i++) {
+        // Screen
+        lda $0400+((i+1)*40),y
+        sta $0400+(i*40),y
+        // ColorMap
+        //lda $d800+(i*40),y
+        //sta $d800+(i*40),y
+    }
+    dey
+    bmi end
+    jmp print
+    end:
+}
+
+// Shifts the whole screen @ $0400 down a line
+.macro ShiftScreenDown_OLD() {
 // Load character from screen and put up a line
 lda #$07
 sta src+2

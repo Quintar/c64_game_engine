@@ -3,7 +3,7 @@ Remember, all assembled programms have a two bytes starting address, those are w
 stores a readfile function in the variable 'readfile'
 */
 .macro autostart(start, progfilename, nobasic) {
-    .segment Autostart[] "Autostart"
+    .segment Autostart[outPrg="autostart.prg"] "Autostart"
     * = $326	//DO NOT CHANGE, else the autostart will fail
 
     .word boot	//autostart from charout vector ($f1ca)
