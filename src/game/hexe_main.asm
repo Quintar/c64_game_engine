@@ -1,32 +1,11 @@
-
-.macro SetupFirstStart() {
-        DeactivateBasic()
-        ClearScreen()
-        CopyString(loadingtext, screen1)
-
-        Set40Column(true) // Set 40 column mode
-        Set25Rows(true) // Set 25 rows mode
-}
+.var maplength = 120
 
 .macro ShowMainMenu() {
-    ClearScreen()
-    SetupScreenMultiBitmap(0)
-    SetCharacterMapPointer(4)
-    SetScreenColors(0, 5)
-    setColors(9,14,8)
-    // Show Title Picture
-    SetPointers(hexetitlepic, $2000, loadcol)
-        jmp readFile
-    loadcol: SetPointers(hexetitlecol, colorram, loadchar)
-        jmp readFile
-    loadchar: SetPointers(hexetitlechar, screen1, endtitleload)
-        jmp readFile
-    endtitleload:
+    LoadAndShowBitmap(hexetitlepic, hexetitlecol, hexetitlechar, screen1)
 }
 
 .macro ShowGamePlay() {
     .var MapRam = $4000
-    .var maplength = 64
         // Load Sprites and Background-Data
     hexmap: SetPointers(hexebackmap, MapRam, bchar)
             jmp readFile

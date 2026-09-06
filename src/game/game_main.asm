@@ -4,6 +4,7 @@
 .var onVBlankStart = 300
 .var onVBlankEnd = 312
 
+#import "c64_game_logic.asm"
 #import "hexe_main.asm"
 
 .segment ProgStart[outPrg="main.prg"] "Programm Start"
@@ -52,7 +53,7 @@ begin:
     .var directionDown = 4
 
 // Initial Setup
-    SetupFirstStart()
+    SetupFirstStart(screen1, false, false)
 
     //ShowMainMenu()
     ShowGamePlay() //Just for tests
@@ -61,25 +62,34 @@ begin:
 
     setStates(StateKeyboard, StateOverWorld) // Set initial game states
 
+    InitRaster()
+    OnRaster(onVBlankStart, doRaster) // Setup raster interrupt at start of VBlank to run our game loop, you can change the rasterline to your needs, just make sure to choose a line after the visible screen area and before the next frame starts (after line 312)
+
 // Main Loop
 loop:    
-    lda lowState
-    beq loop
     switchLowLogic()
-    lda #StateKeyboard
-    //lda #StateNull
-    sta lowState
 jmp loop
 
 doRaster:
+    inc lowState
+    lda lowState
+    cmp #stateLogic+1
+    bne !+
+    lda #StateKeyboard
+    sta lowState
+    !:
+    sta screen1 // Just for testing, output the lowState to the screen
     EndRaster()
 
 doSoftScroll:
+    //scrollScreenByPlayerDirection()
     rts
+
+scrollScreen()
 
 doPollKeyboard:
     switchKeyLogic()
-    //rts
+    rts
 
 doPollJoystick1:
     rts
@@ -88,175 +98,45 @@ doPollJoystick2:
     rts
 
 doLogic:
-    lda highState
     switchHighLogic()
     rts
 
-doRenderGraphics:
+doRenderGraphics: // Shift screen based on playerDirection
+    //shiftScreenByDirection()
     rts
 
 doLoadMapParts:
+    loadMapPartsByDirection()
     rts
 
 QuickSetColorRam:
     QuickSetColorRamFromA()
     rts
     
-Copy: CopyTo()
+Copy: 
+    CopyTo()
     rts
 
 readFile:
-    ReadFile(zeroUnused1) //No rts needed as you jump away in this funciton; zeroUnused1 is the address of an error byte
+    ReadFile(zeroUnused1) //No rts needed as you jump away in this funciton; zeroUnused1 is the address of an error byte output
 
-.macro setStates(low, high) {
-    lda #low
-    sta lowState
-    lda #high
-    sta highState
-}
+PrintColumnToScreen: 
+    PrintColumnToScreen(maplength)
+    rts
 
-.macro switchLowLogic() {
-    cmp #StateKeyboard
-    bne !+
-    jsr doPollKeyboard
-
-!:  cmp #StateJoystick1
-    bne !+
-    jsr doPollJoystick1
-    
-!:  cmp #StateJoystick2
-    bne !+
-    jsr doPollJoystick2
-    
-!:  cmp #stateScroll
-    bne !+
-    jsr doSoftScroll
-    
-!:  cmp #statePaint
-    bne !+
-    jsr doRenderGraphics
-    
-!:  cmp #stateLoadMapParts
-    bne !+
-    jsr doLoadMapParts
-    
-!:  cmp #stateLogic
-    bne !+
-    jsr doLogic
-
-    !:
-}
-
-.macro switchKeyLogic() {
-    lda highState
-    cmp #StateMenu
-    bne !+ // Jump to next segment
-    jsr switchKeyLogicMenu
-
-!:  cmp #StateOverWorld
-    bne !+
-    jsr switchKeyLogicWorld
-
-!:  cmp #StateInBattle
-    bne !+
-    jsr switchKeyLogicBattle
-
-!:  cmp #StateInInventory
-    bne !+
-    jsr switchKeyLogicInventory
-
-    !: rts
-
-    KeyboardLogic()
-}
-
-.macro switchHighLogic() {
-    cmp #StateMenu
-    //beq showMenuLogic
-
-    cmp #StateOverWorld
-    //beq overWorldLogic
-
-    cmp #StateInBattle
-    //beq inBattleLogic
-
-    cmp #StateInInventory
-    //beq inInventoryLogic
-}
-
-.macro KeyboardLogic() {
-    @switchKeyLogicMenu:
-        getKeyboard(0)
-        cmp #withKey('w')
-        cmp #withKey('a')
-        cmp #withKey('s')
-        cmp #withKey('d')
-
-        rts
-
-    @switchKeyLogicWorld: 
-        getKeyboard(0)
-        cmp #$09 //withKey('w')
-        bne !+
-        jmp doMoveUp
-!:      cmp #$0a//#withKey('a')
-        bne !+
-        jmp doMoveLeft
-!:      cmp #$0d //#withKey('s')
-        bne !+
-        jmp doMoveDown
-!:      cmp #$12//#withKey('d')
-        bne !+
-        jmp doMoveRight
-!:      rts
-
-    @switchKeyLogicBattle:
-        getKeyboard(0)
-        cmp #withKey('w')
-        cmp #withKey('a')
-        cmp #withKey('s')
-        cmp #withKey('d')
-
-        rts
-
-    @switchKeyLogicInventory:
-        getKeyboard(0)
-        cmp #withKey('w')
-        cmp #withKey('a')
-        cmp #withKey('s')
-        cmp #withKey('d')
-
-        rts
-}
+PrintRowToScreen: 
+    PrintRowToScreen(maplength)
+    rts
 
 //Functions
-doMoveUp:
-    ShiftScreenUp()
-    lda #0
-    sta $cb
-    rts
-
-doMoveDown:
-    ShiftScreenDown()
-    lda #0
-    sta $cb
-    rts
-
-doMoveLeft:
-    ShiftScreenLeft()
-    lda #0
-    sta $cb
-    rts
-
-doMoveRight:
-    ShiftScreenRight()
-    lda #0
-    sta $cb
-    rts
-
+// Shift screen functions, take about half a frame each
+ShiftScreens()
 
 //Variables
 lowState: .byte 0
 highState: .byte 0
+playerDirection: .byte 0
+currentMapX: .byte 0
+currentMapY: .byte 0
 
 Strings()

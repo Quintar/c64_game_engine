@@ -73,10 +73,10 @@
 .var sprites200          = $3200 // Spriteposition 200
 
 //Screen
-.var viccfg0         = $d011     // VIC configuration Bit 7=8tes Bit Rasterposition// 6=Extended-Color-mode// 5=1Grafikmode/0Textmode// 4=Screen on/off// 3=25Rows// 2-0=scroll Y
+.var viccfg0         = $d011     // VIC configuration Bit 7=8tes Bit Rasterposition// 6=Extended-Color-mode// 5=1Grafikmode/0Textmode// 4=Screen on/off// 3=25Rows// 2-0=scroll Y/Hoch/Runter
 .var raster          = $D012     // Rasterposition
 .var rasterpos       = $d012     // Rasterposition
-.var viccfg1         = $d016     // VIC configuration Bit 7-5=unused// 4=Multi-Color-mode// 3=40 coloumns// 2-0=scroll X
+.var viccfg1         = $d016     // VIC configuration Bit 7-5=unused// 4=Multi-Color-mode// 3=40 coloumns// 2-0=scroll X/Links/Rechts
 .var asciicfg        = $d018     // Bit 7-4 = screen-memory-Offset// 3-1 = character-address-offset // 0 unused
 .var foreground      = $d021     // background color (rotates through all 16 colors)
 .var screencolor     = $d021     // background color (rotates through all 16 colors)

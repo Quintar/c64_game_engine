@@ -28,26 +28,28 @@
 
     @switchKeyLogicWorld: 
         getKeyboard(0)
-        cmp #$09 //withKey('w')
+        cmp #withKey('w')
         bne !+
         lda #directionUp
         sta playerDirection
-        //jmp doMoveUp
-!:      cmp #$0a//#withKey('a')
+        jsr moveUp
+!:      cmp #withKey('a')
         bne !+
         lda #directionLeft
         sta playerDirection
-        //jmp doMoveLeft
-!:      cmp #$0d //#withKey('s')
+        jsr moveLeft
+!:      cmp #withKey('s')
         bne !+
         lda #directionDown
         sta playerDirection
-        //jmp doMoveDown
-!:      cmp #$12//#withKey('d')
+        jsr moveDown
+!:      cmp #withKey('d')
         bne !+
         lda #directionRight
         sta playerDirection
-        //jmp doMoveRight
+        jsr moveRight
+
+        //shiftScreenByDirection()
 !:      .if(rtsAfter){rts} else {jmp end}
 
     @switchKeyLogicBattle:
@@ -88,7 +90,6 @@
     bne !+
     jsr switchKeyLogicInventory
 
-
 !:  
     lda #0
     sta CurrentKey
@@ -98,6 +99,7 @@
 }
 
 .macro switchLowLogic() {
+    lda lowState
     cmp #StateKeyboard
     bne !+
     jsr doPollKeyboard
@@ -148,16 +150,16 @@
     lda playerDirection
     cmp #directionUp
     bne !+
-    jsr doMoveUp
+    jsr moveUp
 !:  cmp #directionDown
     bne !+
-    jsr doMoveDown
+    jsr moveDown
 !:  cmp #directionLeft
     bne !+
-    jsr doMoveLeft
+    jsr moveLeft
 !:  cmp #directionRight
     bne !+
-    jsr doMoveRight
+    jsr moveRight
 !:  
 }
 
@@ -205,4 +207,20 @@
     rts
 @scrollScreenRight: scrollScreenRight(3)
     rts    
+}
+
+.macro LoadAndShowBitmap(image, colors, characters, output) {
+    ClearScreen()
+    SetupScreenMultiBitmap(0)
+    SetCharacterMapPointer(4)
+    SetScreenColors(0, 5)
+    setColors(9,14,8)
+    // Show Title Picture
+    SetPointers(image, $2000, loadcol)
+        jmp readFile
+    loadcol: SetPointers(colors, colorram, loadchar)
+        jmp readFile
+    loadchar: SetPointers(characters, output, endtitleload)
+        jmp readFile
+    endtitleload:
 }

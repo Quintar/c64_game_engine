@@ -389,7 +389,9 @@ ctgt:   sta $ffff //dbbf
         .var multiplier = 25
         .if (multiplier <= 0) { .eval multiplier = 1 }
         ldy #0
-        copy:
+        
+
+        /*copy:
         .for (var i=0; i<multiplier; i++) {
                 // Screen
                 lda $0401+(i*40), y
@@ -401,7 +403,7 @@ ctgt:   sta $ffff //dbbf
         iny
         cpy #40
         beq end
-        jmp copy
+        jmp copy*/
         end:
 }
 
@@ -424,4 +426,66 @@ ctgt:   sta $ffff //dbbf
         beq end
         jmp copy
         end:
+}
+
+.macro ShiftScreens() {
+@moveUp:
+    ShiftScreenUp()
+    rts
+
+@moveDown:
+    ShiftScreenDown()
+    rts
+
+@moveLeft:
+    ShiftScreenLeft()
+    rts
+
+@moveRight:
+    ShiftScreenRight()
+    rts
+}
+
+.macro scrollScreenLeft(middlePosition) {
+    scroolScreenUpLeft(middlePosition, viccfg1)
+}
+
+.macro scrollScreenRight(middlePosition) {
+    scroolScreenDownRight(middlePosition, viccfg1)
+}
+
+.macro scrollScreenUp(middlePosition) {
+    scroolScreenUpLeft(middlePosition, viccfg0)
+}
+
+.macro scrollScreenDown(middlePosition) {
+    scroolScreenDownRight(middlePosition, viccfg0)
+}
+
+
+.macro scroolScreenUpLeft(middlePosition, vic) {
+    lda vic
+    and #%00000111
+    beq setToMiddlePosition
+    dec vic
+    jmp !+
+setToMiddlePosition:
+    .for (var i=0; i<middlePosition; i++) {
+        inc vic
+    }
+!: 
+}
+
+.macro scroolScreenDownRight(middlePosition, vic) {
+    lda vic
+    and #%00000111
+    cmp #7
+    beq setToMiddlePosition
+    inc vic
+    jmp !+
+setToMiddlePosition:
+    .for (var i=0; i<middlePosition; i++) {
+        dec vic
+    }
+!: 
 }

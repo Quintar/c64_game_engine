@@ -2,7 +2,7 @@
 #import "math.asm"
 #import "memmanipulation.asm"
 
-#import "c64_includes.asm"
+#import "../c64_includes/c64_includes.asm"
 
 .macro assemblyInfo(start, end, spriteoffset) {
     .print "Zero Page $0000 - $00ff"
