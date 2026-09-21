@@ -309,7 +309,7 @@ tgt:    sta $ffff //0400 1024
 
 
 .macro ShiftScreenDown() {
-    ldy #40
+    ldy #0
     print:
     .for (var i=24; i>=1; i--) {
         // Screen
@@ -319,14 +319,15 @@ tgt:    sta $ffff //0400 1024
         //lda $d800+(i*40),y
         //sta $d800+(i*40),y
     }
-    dey
-    bmi end
+    iny
+    cpy #40
+    beq end
     jmp print
     end:
 }
 
 .macro ShiftScreenUp() {
-    ldy #40
+    ldy #0
     print:
     .for (var i=0; i<=23; i++) {
         // Screen
@@ -336,62 +337,19 @@ tgt:    sta $ffff //0400 1024
         //lda $d800+(i*40),y
         //sta $d800+(i*40),y
     }
-    dey
-    bmi end
+    iny
+    cpy #40
+    beq end
     jmp print
     end:
-}
-
-// Shifts the whole screen @ $0400 down a line
-.macro ShiftScreenDown_OLD() {
-// Load character from screen and put up a line
-lda #$07
-sta src+2
-sta tgt+2
-lda #$e7
-sta tgt+1
-sta ctgt+1
-lda #$bf
-sta src+1
-sta csrc+1
-lda #$db
-sta csrc+2
-sta ctgt+2
-
-src:    lda $ffff //07e7
-tgt:    sta $ffff //07bf
-csrc:   lda $ffff //dbe7
-ctgt:   sta $ffff //dbbf
-
-// decrease position
-        dec src+1
-        dec csrc+1
-        bne !+
-        dec src+2
-        dec csrc+2
-!:      dec tgt+1
-        dec ctgt+1
-        bne !+
-        dec tgt+2
-        dec ctgt+2
-
-// Check if end of screen
-!:      lda src+2
-        cmp #$03
-        bne src
-        lda src+1
-        cmp #$ff
-        bne src
 }
 
 // Shifts the whole screen @ $0400 left a column
 .macro ShiftScreenLeft() {
         .var multiplier = 25
         .if (multiplier <= 0) { .eval multiplier = 1 }
-        ldy #0
-        
-
-        /*copy:
+        ldy #38
+        copy:
         .for (var i=0; i<multiplier; i++) {
                 // Screen
                 lda $0401+(i*40), y
@@ -400,10 +358,9 @@ ctgt:   sta $ffff //dbbf
                 //lda $d801+(i*40), y
                 //sta $d800+(i*40), y
         }
-        iny
-        cpy #40
-        beq end
-        jmp copy*/
+        dey
+        bmi end
+        jmp copy
         end:
 }
 
@@ -411,7 +368,7 @@ ctgt:   sta $ffff //dbbf
 .macro ShiftScreenRight() {
         .var multiplier = 25
         .if (multiplier <= 0) { .eval multiplier = 1 }
-        ldy #39
+        ldy #38
         copy:
         .for (var i=0; i<multiplier; i++) {
                 // Screen
@@ -422,8 +379,7 @@ ctgt:   sta $ffff //dbbf
                 //sta $d801+(i*40), y
         }
         dey
-        //cpy #0
-        beq end
+        bmi end
         jmp copy
         end:
 }
