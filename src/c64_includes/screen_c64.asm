@@ -346,7 +346,7 @@ tgt:    sta $ffff //0400 1024
 
 // Shifts the whole screen @ $0400 left a column
 .macro ShiftScreenLeft() {
-        .var multiplier = 25
+        .var multiplier = 24
         .if (multiplier <= 0) { .eval multiplier = 1 }
         ldy #38
         copy:
@@ -359,14 +359,14 @@ tgt:    sta $ffff //0400 1024
                 //sta $d800+(i*40), y
         }
         dey
-        bmi end
+        beq end
         jmp copy
         end:
 }
 
 // Shifts the whole screen @ $0400 right a column
 .macro ShiftScreenRight() {
-        .var multiplier = 25
+        .var multiplier = 24
         .if (multiplier <= 0) { .eval multiplier = 1 }
         ldy #38
         copy:
@@ -379,7 +379,7 @@ tgt:    sta $ffff //0400 1024
                 //sta $d801+(i*40), y
         }
         dey
-        bmi end
+        beq end
         jmp copy
         end:
 }

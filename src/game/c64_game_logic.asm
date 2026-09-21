@@ -1,3 +1,47 @@
+//Program start at...
+.var ProgramStartAddress = $0800
+
+// Game Coding Style: Statemachine
+// Each state is represented by a subroutine:
+// - Poll keyboard and/or Joystick input
+// - Game logic
+// - Render graphics to screen
+//  -  soft scroll (reset at edge of screen)
+//  -  update sprites-positions
+//  -  load new map parts (every 3 steps) if needed
+// - raster wait to end of frame
+
+// High level states could be:
+// - Title screen
+// - Gameplay
+//  - Game-screen
+//  - Status-part
+//  - Inventory screen
+//  - Pause
+// - Game over
+
+// Low level states
+.var StateKeyboard = 1
+.var StateJoystick1 = 2
+.var StateJoystick2 = 3
+.var stateScroll = 4
+.var stateLoadMapParts = 5
+.var statePaint = 6
+.var stateLogic = 7
+
+// Program/Game States
+.var StateNull = 0
+.var StateMenu = 1
+.var StateOverWorld = 2
+.var StateInBattle = 3
+.var StateInInventory = 4
+
+// Directions
+.var directionNull = 0
+.var directionLeft = 1
+.var directionRight = 2
+.var directionUp = 3
+.var directionDown = 4
 
 /// setups a startup sequence for the game, including setting the screen mode, clearing the screen, and showing a loading message
 .macro SetupFirstStart(screen, widecolumns, manyrows) {
@@ -9,11 +53,74 @@
         Set25Rows(manyrows) // Set 25 rows mode
 }
 
+.macro FunctionImplementations() {
+ @doSoftScroll:
+    //scrollScreenByPlayerDirection()
+    rts
+
+scrollScreen()
+
+@doPollKeyboard:
+    switchKeyLogic()
+    rts
+
+@doPollJoystick1:
+    rts
+
+@doPollJoystick2:
+    rts
+
+@doLogic:
+    switchHighLogic()
+    rts
+
+@doRenderGraphics: // Shift screen based on playerDirection
+    //shiftScreenByDirection()
+    rts
+
+@doLoadMapParts:
+    loadMapPartsByDirection()
+    rts
+
+@QuickSetColorRam:
+    QuickSetColorRamFromA()
+    rts
+    
+@Copy: 
+    CopyTo()
+    rts
+
+@readFile:
+    ReadFile(zeroUnused1) //No rts needed as you jump away in this funciton; zeroUnused1 is the address of an error byte output
+
+@PrintColumnToScreen: 
+    PrintColumnToScreen(maplength)
+    rts
+
+@PrintRowToScreen: 
+    PrintRowToScreen(maplength)
+    rts
+
+// Shift screen functions, take about half a frame each
+    ShiftScreens()
+}
+
 .macro setStates(low, high) {
     lda #low
     sta lowState
     lda #high
     sta highState
+}
+
+.macro VariablesAndStrings() {
+    //Variables
+    @lowState: .byte 0
+    @highState: .byte 0
+    @playerDirection: .byte 0
+    @currentMapX: .byte 0
+    @currentMapY: .byte 0
+
+    Strings()
 }
 
 .macro WASDKeyboardLogic(rtsAfter) {
@@ -33,24 +140,31 @@
         lda #directionUp
         sta playerDirection
         jsr moveUp
+        jmp endKeyWorld
+
 !:      cmp #withKey('a')
         bne !+
         lda #directionLeft
         sta playerDirection
         jsr moveLeft
+        jmp endKeyWorld
+
 !:      cmp #withKey('s')
         bne !+
         lda #directionDown
         sta playerDirection
         jsr moveDown
+        jmp endKeyWorld
+
 !:      cmp #withKey('d')
         bne !+
         lda #directionRight
         sta playerDirection
         jsr moveRight
 
-        //shiftScreenByDirection()
-!:      .if(rtsAfter){rts} else {jmp end}
+!:        //shiftScreenByDirection()
+endKeyWorld:      
+        .if(rtsAfter){rts} else {jmp end}
 
     @switchKeyLogicBattle:
         getKeyboard(0)
@@ -77,20 +191,21 @@
     cmp #StateMenu
     bne !+ // Jump to next segment
     jsr switchKeyLogicMenu
-
+    jmp endKey
 !:  cmp #StateOverWorld
     bne !+
     jsr switchKeyLogicWorld
-
+    jmp endKey
 !:  cmp #StateInBattle
     bne !+
     jsr switchKeyLogicBattle
-
+    jmp endKey
 !:  cmp #StateInInventory
     bne !+
     jsr switchKeyLogicInventory
 
 !:  
+endKey:
     lda #0
     sta CurrentKey
     rts
@@ -103,32 +218,39 @@
     cmp #StateKeyboard
     bne !+
     jsr doPollKeyboard
+    jmp end
 
 !:  cmp #StateJoystick1
     bne !+
     jsr doPollJoystick1
+    jmp end
     
 !:  cmp #StateJoystick2
     bne !+
     jsr doPollJoystick2
+    jmp end
     
 !:  cmp #stateScroll
     bne !+
     jsr doSoftScroll
+    jmp end
     
 !:  cmp #statePaint
     bne !+
     jsr doRenderGraphics
+    jmp end
     
 !:  cmp #stateLoadMapParts
     bne !+
     jsr doLoadMapParts
+    jmp end
     
 !:  cmp #stateLogic
     bne !+
     jsr doLogic
 
     !:
+    end:
 }
 
 .macro switchHighLogic() {
